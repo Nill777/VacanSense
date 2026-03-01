@@ -4,21 +4,25 @@ import com.vacansense.data.db.VacancyDao
 import com.vacansense.data.db.VacancyEntity
 import com.vacansense.data.network.HhApi
 import com.vacansense.domain.irepositories.IVacancyRepository
+import com.vacansense.domain.models.HhFilters
 import com.vacansense.domain.models.Vacancy
+import kotlinx.coroutines.flow.map
 
-class VacancyRepository(
-    private val api: HhApi,
-    private val dao: VacancyDao
-) : IVacancyRepository {
-
-    override suspend fun getNewVacanciesFromHH(query: String): List<Vacancy> {
+class VacancyRepository(private val api: HhApi, private val dao: VacancyDao) : IVacancyRepository {
+    override suspend fun getNewVacanciesFromHH(query: String, filters: HhFilters): List<Vacancy> {
         return try {
-            val response = api.getVacancies(text = query)
+            val response = api.getVacancies(
+                text = query,
+                area = filters.area.takeIf { it.isNotBlank() },
+                period = filters.period.takeIf { it > 0 },
+                experience = filters.experience.takeIf { it.isNotBlank() },
+                employment = filters.employment.takeIf { it.isNotBlank() },
+                schedule = filters.schedule.takeIf { it.isNotBlank() },
+                salary = filters.salary.takeIf { it > 0 }
+            )
             response.body()?.items?.map { item ->
-                val salaryStr = if (item.salary != null) {
-                    "от ${item.salary.from ?: ""} до ${item.salary.to ?: ""} ${item.salary.currency}"
-                } else "Не указана"
-
+                val salaryStr =
+                    if (item.salary != null) "от ${item.salary.from ?: ""} до ${item.salary.to ?: ""} ${item.salary.currency}" else "Не указана"
                 Vacancy(
                     item.id,
                     item.name,
@@ -33,17 +37,15 @@ class VacancyRepository(
         }
     }
 
-    override suspend fun getFullDescription(vacancyId: String): String {
-        return try {
-            val response = api.getVacancyDetails(vacancyId)
-            response.body()?.description?.replace(Regex("<[^>]*>"), "") ?: ""
-        } catch (e: Exception) {
-            ""
-        }
+    override suspend fun getFullDescription(vacancyId: String): String = try {
+        val response = api.getVacancyDetails(vacancyId)
+        response.body()?.description?.replace(Regex("<[^>]*>"), "") ?: ""
+    } catch (e: Exception) {
+        ""
     }
 
-    override suspend fun getUnprocessedVacancy(): Vacancy? {
-        val entity = dao.getNew() ?: return null
+    override suspend fun getUnprocessedVacancy(query: String): Vacancy? {
+        val entity = dao.getNewForQuery(query) ?: return null
         return Vacancy(
             entity.id,
             entity.title,
@@ -56,10 +58,11 @@ class VacancyRepository(
         )
     }
 
-    override suspend fun saveVacancy(vacancy: Vacancy) {
+    override suspend fun saveVacancy(vacancy: Vacancy, query: String) {
         dao.insert(
             VacancyEntity(
                 vacancy.id,
+                query,
                 vacancy.title,
                 vacancy.employer,
                 vacancy.salary,
@@ -71,11 +74,28 @@ class VacancyRepository(
         )
     }
 
-    override suspend fun updateStatus(id: String, status: String, summary: String) {
+    override suspend fun updateStatus(id: String, status: String, summary: String) =
         dao.updateStatus(id, status, summary)
-    }
 
-    override suspend fun isVacancyExists(id: String): Boolean {
-        return dao.exists(id)
-    }
+    override suspend fun isVacancyExists(id: String): Boolean = dao.exists(id)
+
+    override fun getVacanciesForQueryFlow(query: String) =
+        dao.getByQueryFlow(query)
+            .map { list ->
+                list.map {
+                    Vacancy(
+                        it.id,
+                        it.title,
+                        it.employer,
+                        it.salary,
+                        it.url,
+                        it.publishedAt,
+                        it.status,
+                        it.summary
+                    )
+                }
+            }
+
+    override suspend fun deleteVacancy(id: String) = dao.deleteById(id)
+    override suspend fun resetVacancyStatus(id: String) = dao.updateStatus(id, "NEW", "")
 }

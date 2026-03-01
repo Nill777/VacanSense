@@ -11,15 +11,21 @@ interface HhApi {
     @GET("vacancies")
     suspend fun getVacancies(
         @Query("text") text: String,
-        @Query("area") area: Int = 1,
+        @Query("area") area: String? = "1",
         @Query("per_page") perPage: Int = 20,
-        @Query("order_by") orderBy: String = "publication_time"
+        @Query("order_by") orderBy: String = "publication_time",
+        @Query("period") period: Int? = null,
+        @Query("experience") experience: String? = null,
+        @Query("employment") employment: String? = null,
+        @Query("schedule") schedule: String? = null,
+        @Query("salary") salary: Int? = null
     ): Response<HhSearchResponse>
 
     @GET("vacancies/{id}")
     suspend fun getVacancyDetails(@Path("id") id: String): Response<HhDetailResponse>
 }
 
+// Data классы оставьте как были
 data class HhSearchResponse(val items: List<HhItem>)
 data class HhItem(
     val id: String,
