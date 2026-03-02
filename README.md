@@ -1,11 +1,15 @@
+<p align="center">
+    <img src="./img/icon.png" width="180"/>
+</p>
+
 # VacanSense AI
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Kotlin-2.3.0-blue.svg?logo=kotlin" alt="Kotlin">
-  <img src="https://img.shields.io/badge/Jetpack%20Compose-Modern%20UI-green.svg?logo=android" alt="Jetpack Compose">
-  <img src="https://img.shields.io/badge/Clean%20Architecture-Solid-orange.svg" alt="Clean Architecture">
-  <img src="https://img.shields.io/badge/Local%20LLM-LlamaCpp-red.svg" alt="Local LLM">
-  <img src="https://img.shields.io/badge/Room-Database-lightgrey.svg" alt="Room">
+    <img src="https://img.shields.io/badge/Kotlin-2.3.0-blue.svg?logo=kotlin" alt="Kotlin">
+    <img src="https://img.shields.io/badge/Jetpack%20Compose-Modern%20UI-green.svg?logo=android" alt="Jetpack Compose">
+    <img src="https://img.shields.io/badge/Clean%20Architecture-Solid-orange.svg" alt="Clean Architecture">
+    <img src="https://img.shields.io/badge/Local%20LLM-LlamaCpp-red.svg" alt="Local LLM">
+    <img src="https://img.shields.io/badge/Room-Database-lightgrey.svg" alt="Room">
 </p>
 
 **VacanSense AI** — это умный Android-ассистент для автоматизированного поиска и анализа вакансий. Приложение самостоятельно ищет новые вакансии на HH.ru по заданным фильтрам, пропускает их через **локальную нейросеть (LLM)** прямо на вашем устройстве, делает краткую выжимку и отправляет идеальные совпадения вам в Telegram.
