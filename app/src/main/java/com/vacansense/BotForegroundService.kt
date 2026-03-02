@@ -15,9 +15,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 class BotForegroundService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -46,8 +47,10 @@ class BotForegroundService : Service() {
         val processUseCase = appContainer.processVacanciesUseCase
         val settingsRepo = appContainer.settingsRepository
         val downloadManager = appContainer.modelDownloadManager
+        val signalManager = appContainer.botSignalManager
 
         serviceScope.launch {
+            processUseCase.resetProcessingToNew()
             while (isActive) {
                 try {
                     val settings = settingsRepo.getSettings()
@@ -69,11 +72,9 @@ class BotForegroundService : Service() {
                             hasMoreWork = processUseCase.processNext(absPath)
 
                             if (hasMoreWork) {
-                                // Если вакансия обработана, делаем небольшую паузу перед следующей,
-                                // чтобы дать процессору остыть и не спамить в телеграм слишком часто.
                                 Log.i(
                                     "BotService",
-                                    "Вакансия обработана. Пауза 10 сек перед следующей..."
+                                    "Вакансия обработана"
                                 )
                             }
                         }
@@ -87,7 +88,9 @@ class BotForegroundService : Service() {
 
                 // 3. Когда все вакансии обработаны, засыпаем надолго (например, 5 минут)
                 Log.i("BotService", "=== Цикл завершен. Сон 5 минут ===")
-                delay(5 * 60 * 1000)
+                withTimeoutOrNull(5 * 60 * 1000L) {
+                    signalManager.wakeUpSignal.first()
+                }
             }
         }
 

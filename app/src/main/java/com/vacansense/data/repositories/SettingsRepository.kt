@@ -40,9 +40,9 @@ class SettingsRepository(private val context: Context) : ISettingsRepository {
             tgToken = prefs[Keys.TG_TOKEN] ?: "",
             tgChatId = prefs[Keys.TG_CHAT_ID] ?: "",
             positivePrompt = prefs[Keys.POSITIVE_PROMPT]
-                ?: "Сделай выжимку из этой вакансии. Напиши строго 3 пункта на русском языке без лишних слов:\n1. Стек технологий.\n2. Обязанности.\n3. Условия работы.",
+                ?: "Сделай короткое саммари этой вакансии на русском языке. Тезисно самое основное",
             negativePrompt = prefs[Keys.NEGATIVE_PROMPT] ?: "",
-            negativeThreshold = prefs[Keys.THRESHOLD] ?: 80,
+            negativeThreshold = prefs[Keys.THRESHOLD] ?: 50,
             selectedModelFileName = prefs[Keys.SELECTED_MODEL] ?: ""
         )
     }

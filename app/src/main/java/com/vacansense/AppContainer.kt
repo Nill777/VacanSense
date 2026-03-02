@@ -11,6 +11,7 @@ import com.vacansense.data.repositories.SettingsRepository
 import com.vacansense.data.repositories.TelegramRepository
 import com.vacansense.data.repositories.VacancyRepository
 import com.vacansense.domain.usecases.ProcessVacanciesUseCase
+import com.vacansense.domain.utils.BotSignalManager
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -37,7 +38,7 @@ class AppContainer(context: Context) {
     val llmRepository by lazy { LlamaCppEngine(context) }
     val settingsRepository by lazy { SettingsRepository(context) }
     val modelDownloadManager by lazy { ModelDownloadManager(context) }
-
+    val botSignalManager by lazy { BotSignalManager() }
     val processVacanciesUseCase by lazy {
         ProcessVacanciesUseCase(
             vacancyRepository,

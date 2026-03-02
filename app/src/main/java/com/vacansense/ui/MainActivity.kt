@@ -28,7 +28,8 @@ class MainActivity : ComponentActivity() {
         MainViewModel.Factory(
             appContainer.settingsRepository,
             appContainer.modelDownloadManager,
-            appContainer.vacancyRepository
+            appContainer.vacancyRepository,
+            appContainer.botSignalManager
         )
     }
 

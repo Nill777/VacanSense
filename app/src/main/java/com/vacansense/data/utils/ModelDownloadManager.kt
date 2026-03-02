@@ -13,19 +13,36 @@ import java.io.File
 
 class ModelDownloadManager(private val context: Context) {
 
-    // ДОБАВЛЕНО ?download=true чтобы HuggingFace отдавал файл, а не HTML
     val predefinedModels = listOf(
         AiModel(
-            "qwen2.5-0.5b-instruct-q8_0.gguf",
-            "Qwen 2.5 (0.5B)",
-            "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q8_0.gguf?download=true",
-            "~550 MB"
+            fileName = "qwen2.5-0.5b-instruct-q8_0.gguf",
+            name = "Qwen 2.5 (0.5B) - Ультра-быстрая",
+            downloadUrl = "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q8_0.gguf?download=true",
+            size = "~550 MB"
         ),
         AiModel(
-            "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf",
-            "TinyLlama (1.1B)",
-            "https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf?download=true",
-            "~680 MB"
+            fileName = "llama-3.2-1b-instruct-q5_k_m.gguf",
+            name = "Llama 3.2 (1B) - Лёгкая",
+            downloadUrl = "https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q5_K_M.gguf?download=true",
+            size = "~890 MB"
+        ),
+        AiModel(
+            fileName = "qwen2.5-1.5b-instruct-q5_k_m.gguf",
+            name = "Qwen 2.5 (1.5B) - Баланс (Рекомендуем)",
+            downloadUrl = "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q5_k_m.gguf?download=true",
+            size = "~1.12 GB"
+        ),
+        AiModel(
+            fileName = "gemma-3-4b-it-q3_k_m.gguf",
+            name = "Gemma 3 (4B) - Новинка Google",
+            downloadUrl = "https://huggingface.co/bartowski/gemma-3-4b-it-GGUF/resolve/main/gemma-3-4b-it-Q3_K_M.gguf?download=true",
+            size = "~1.9 GB"
+        ),
+        AiModel(
+            fileName = "llama-3.2-3b-instruct-q4_k_m.gguf",
+            name = "Llama 3.2 (3B) - Мощная",
+            downloadUrl = "https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf?download=true",
+            size = "~1.95 GB"
         )
     )
 
@@ -148,6 +165,29 @@ class ModelDownloadManager(private val context: Context) {
         if (index != -1) {
             current[index] = current[index].copy(state = state, downloadProgress = progress)
             _modelsState.value = current
+        }
+    }
+
+    fun deleteModel(fileName: String) {
+        try {
+            // Удаляем файл из внутренней директории
+            val internalFile = File(context.filesDir, fileName)
+            if (internalFile.exists()) {
+                internalFile.delete()
+            }
+
+            // На всякий случай подчищаем и во внешней (если вдруг зависло скачивание)
+            val externalFile = File(context.getExternalFilesDir(null), fileName)
+            if (externalFile.exists()) {
+                externalFile.delete()
+            }
+
+            Log.d("DownloadManager", "Модель $fileName успешно удалена")
+
+            // Обновляем UI-состояние
+            updateModelState(fileName, DownloadState.NOT_DOWNLOADED, 0)
+        } catch (e: Exception) {
+            Log.e("DownloadManager", "Ошибка при удалении модели", e)
         }
     }
 }

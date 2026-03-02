@@ -8,6 +8,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.vacansense.domain.models.VacancyStatus
 import kotlinx.coroutines.flow.Flow
 
 @Entity(tableName = "vacancies")
@@ -19,7 +21,7 @@ data class VacancyEntity(
     val salary: String,
     val url: String,
     val publishedAt: String,
-    val status: String,
+    val status: VacancyStatus,
     val summary: String
 )
 
@@ -28,11 +30,14 @@ interface VacancyDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(vacancy: VacancyEntity)
 
-    @Query("SELECT * FROM vacancies WHERE status = 'NEW' AND queryContext = :query LIMIT 1")
-    suspend fun getNewForQuery(query: String): VacancyEntity?
+    @Query("SELECT * FROM vacancies WHERE status = :status AND queryContext = :query LIMIT 1")
+    suspend fun getByStatusAndQuery(query: String, status: VacancyStatus): VacancyEntity?
 
     @Query("UPDATE vacancies SET status = :status, summary = :summary WHERE id = :id")
-    suspend fun updateStatus(id: String, status: String, summary: String)
+    suspend fun updateStatus(id: String, status: VacancyStatus, summary: String)
+
+    @Query("UPDATE vacancies SET status = :newStatus WHERE status = :oldStatus")
+    suspend fun updateAllByStatus(oldStatus: VacancyStatus, newStatus: VacancyStatus)
 
     @Query("SELECT EXISTS(SELECT 1 FROM vacancies WHERE id = :id)")
     suspend fun exists(id: String): Boolean
@@ -44,7 +49,8 @@ interface VacancyDao {
     suspend fun deleteById(id: String)
 }
 
-@Database(entities = [VacancyEntity::class], version = 2, exportSchema = false)
+@Database(entities = [VacancyEntity::class], version = 3, exportSchema = false)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun vacancyDao(): VacancyDao
 }

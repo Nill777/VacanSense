@@ -1,5 +1,13 @@
 package com.vacansense.domain.models
 
+enum class VacancyStatus {
+    NEW,
+    PROCESSING,
+    DONE,
+    ERROR,
+    REJECTED
+}
+
 data class Vacancy(
     val id: String,
     val title: String,
@@ -7,6 +15,6 @@ data class Vacancy(
     val salary: String,
     val url: String,
     val publishedAt: String,
-    val status: String = "NEW", // NEW, PROCESSING, DONE, ERROR
+    val status: VacancyStatus = VacancyStatus.NEW,
     val summary: String = ""
 )
