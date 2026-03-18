@@ -67,6 +67,13 @@ fun MainScreen(
     var expandedModels by remember { mutableStateOf(false) }
     var modelToDelete by remember { mutableStateOf<AiModel?>(null) }
 
+    var localTgToken by remember { mutableStateOf<String?>(null) }
+    var localTgChatId by remember { mutableStateOf<String?>(null) }
+    var localQuery by remember { mutableStateOf<String?>(null) }
+    var localPosPrompt by remember { mutableStateOf<String?>(null) }
+    var localNegPrompt by remember { mutableStateOf<String?>(null) }
+    var localThreshold by remember { mutableStateOf<String?>(null) }
+
     if (modelToDelete != null) {
         AlertDialog(
             onDismissRequest = { modelToDelete = null },
@@ -107,8 +114,11 @@ fun MainScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             OutlinedTextField(
-                value = settings.tgToken,
-                onValueChange = { s -> viewModel.updateSetting { it.copy(tgToken = s) } },
+                value = localTgToken ?: settings.tgToken,
+                onValueChange = { s ->
+                    localTgToken = s
+                    viewModel.updateSetting { it.copy(tgToken = s) }
+                },
                 label = { Text("Telegram Bot Token") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -119,8 +129,11 @@ fun MainScreen(
             )
 
             OutlinedTextField(
-                value = settings.tgChatId,
-                onValueChange = { s -> viewModel.updateSetting { it.copy(tgChatId = s) } },
+                value = localTgChatId ?: settings.tgChatId,
+                onValueChange = { s ->
+                    localTgChatId = s
+                    viewModel.updateSetting { it.copy(tgChatId = s) }
+                },
                 label = { Text("Telegram Chat ID / User ID") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -132,8 +145,11 @@ fun MainScreen(
             )
 
             OutlinedTextField(
-                value = settings.query,
-                onValueChange = { s -> viewModel.updateSetting { it.copy(query = s) } },
+                value = localQuery ?: settings.query,
+                onValueChange = { s ->
+                    localQuery = s
+                    viewModel.updateSetting { it.copy(query = s) }
+                },
                 label = { Text("Поисковый запрос (HH)") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -143,7 +159,6 @@ fun MainScreen(
                 )
             )
 
-            // Кнопка в стиле текстового поля: высота 56dp, скругление 4dp
             Button(
                 onClick = { navController.navigate("filters") },
                 modifier = Modifier
@@ -154,7 +169,6 @@ fun MainScreen(
                 Text("Настроить фильтры HH", style = MaterialTheme.typography.bodyLarge)
             }
 
-            // -- МОДЕЛИ --
             ExposedDropdownMenuBox(
                 expanded = expandedModels,
                 onExpandedChange = { expandedModels = !expandedModels }
@@ -216,6 +230,7 @@ fun MainScreen(
                                                     }
                                             )
                                         }
+
                                         DownloadState.DOWNLOADING -> {
                                             Text(
                                                 "${model.downloadProgress}%",
@@ -228,6 +243,7 @@ fun MainScreen(
                                                 color = MaterialTheme.colorScheme.onSecondary
                                             )
                                         }
+
                                         else -> {
                                             Icon(
                                                 Icons.Default.Add,
@@ -253,8 +269,11 @@ fun MainScreen(
 
             var posFocused by remember { mutableStateOf(false) }
             OutlinedTextField(
-                value = settings.positivePrompt,
-                onValueChange = { s -> viewModel.updateSetting { it.copy(positivePrompt = s) } },
+                value = localPosPrompt ?: settings.positivePrompt,
+                onValueChange = { s ->
+                    localPosPrompt = s
+                    viewModel.updateSetting { it.copy(positivePrompt = s) }
+                },
                 label = { Text("Позитивный промт (как обрабатывать)") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -270,8 +289,11 @@ fun MainScreen(
 
             var negFocused by remember { mutableStateOf(false) }
             OutlinedTextField(
-                value = settings.negativePrompt,
-                onValueChange = { s -> viewModel.updateSetting { it.copy(negativePrompt = s) } },
+                value = localNegPrompt ?: settings.negativePrompt,
+                onValueChange = { s ->
+                    localNegPrompt = s
+                    viewModel.updateSetting { it.copy(negativePrompt = s) }
+                },
                 label = { Text("Негативный промт (чего не должно быть)") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -288,8 +310,9 @@ fun MainScreen(
 
             if (settings.negativePrompt.isNotBlank()) {
                 OutlinedTextField(
-                    value = settings.negativeThreshold.toString(),
+                    value = localThreshold ?: settings.negativeThreshold.toString(),
                     onValueChange = { s ->
+                        localThreshold = s
                         s.toIntOrNull()?.let { num ->
                             viewModel.updateSetting {
                                 it.copy(

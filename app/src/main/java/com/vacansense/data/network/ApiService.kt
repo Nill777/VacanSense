@@ -11,21 +11,20 @@ interface HhApi {
     @GET("vacancies")
     suspend fun getVacancies(
         @Query("text") text: String,
-        @Query("area") area: String? = "1",
-        @Query("per_page") perPage: Int = 20,
-        @Query("order_by") orderBy: String = "publication_time",
-        @Query("period") period: Int? = null,
-        @Query("experience") experience: String? = null,
-        @Query("employment") employment: String? = null,
-        @Query("schedule") schedule: String? = null,
-        @Query("salary") salary: Int? = null
+        @Query("area") area: String?,
+        @Query("per_page") perPage: Int,
+        @Query("order_by") orderBy: String,
+        @Query("period") period: Int?,
+        @Query("experience") experience: String?,
+        @Query("employment") employment: String?,
+        @Query("schedule") schedule: String?,
+        @Query("salary") salary: Int?
     ): Response<HhSearchResponse>
 
     @GET("vacancies/{id}")
     suspend fun getVacancyDetails(@Path("id") id: String): Response<HhDetailResponse>
 }
 
-// Data классы оставьте как были
 data class HhSearchResponse(val items: List<HhItem>)
 data class HhItem(
     val id: String,
@@ -46,7 +45,7 @@ interface TelegramApi {
         @Url url: String,
         @Query("chat_id") chatId: String,
         @Query("text") text: String,
-        @Query("parse_mode") parseMode: String = "HTML",
-        @Query("disable_web_page_preview") disablePreview: Boolean = true
+        @Query("parse_mode") parseMode: String,
+        @Query("disable_web_page_preview") disablePreview: Boolean
     ): Response<Unit>
 }

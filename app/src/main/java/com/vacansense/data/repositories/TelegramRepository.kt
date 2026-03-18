@@ -10,7 +10,7 @@ class TelegramRepository(private val api: TelegramApi) : ITelegramRepository {
 
         val url = "https://api.telegram.org/bot$token/sendMessage"
         return try {
-            val response = api.sendMessage(url, chatId, text)
+            val response = api.sendMessage(url, chatId, text, "HTML", true)
             if (response.isSuccessful) {
                 Log.d("TelegramRepository", "Сообщение успешно отправлено!")
                 true

@@ -1,5 +1,6 @@
 package com.vacansense.data.repositories
 
+import android.util.Log
 import com.vacansense.data.db.VacancyDao
 import com.vacansense.data.db.VacancyEntity
 import com.vacansense.data.network.HhApi
@@ -15,6 +16,8 @@ class VacancyRepository(private val api: HhApi, private val dao: VacancyDao) : I
             val response = api.getVacancies(
                 text = query,
                 area = filters.area.takeIf { it.isNotBlank() },
+                perPage = 20,
+                orderBy = "publication_time",
                 period = filters.period.takeIf { it > 0 },
                 experience = filters.experience.takeIf { it.isNotBlank() },
                 employment = filters.employment.takeIf { it.isNotBlank() },
@@ -35,6 +38,7 @@ class VacancyRepository(private val api: HhApi, private val dao: VacancyDao) : I
                 )
             } ?: emptyList()
         } catch (e: Exception) {
+            Log.e("VacancyRepo", "getNewVacanciesFromHH", e)
             emptyList()
         }
     }
@@ -43,6 +47,7 @@ class VacancyRepository(private val api: HhApi, private val dao: VacancyDao) : I
         val response = api.getVacancyDetails(vacancyId)
         response.body()?.description?.replace(Regex("<[^>]*>"), "") ?: ""
     } catch (e: Exception) {
+        Log.e("VacancyRepo", "getFullDescription", e)
         ""
     }
 

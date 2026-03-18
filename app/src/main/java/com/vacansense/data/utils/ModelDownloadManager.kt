@@ -33,16 +33,16 @@ class ModelDownloadManager(private val context: Context) {
             size = "~1.12 GB"
         ),
         AiModel(
-            fileName = "gemma-3-4b-it-q3_k_m.gguf",
-            name = "Gemma 3 (4B) - Новинка Google",
-            downloadUrl = "https://huggingface.co/bartowski/gemma-3-4b-it-GGUF/resolve/main/gemma-3-4b-it-Q3_K_M.gguf?download=true",
-            size = "~1.9 GB"
-        ),
-        AiModel(
             fileName = "llama-3.2-3b-instruct-q4_k_m.gguf",
             name = "Llama 3.2 (3B) - Мощная",
             downloadUrl = "https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf?download=true",
             size = "~1.95 GB"
+        ),
+        AiModel(
+            fileName = "gemma-3-4b-it-q5_k_m.gguf",
+            name = "Gemma 3 (4B) - Новинка Google",
+            downloadUrl = "https://huggingface.co/unsloth/gemma-3-4b-it-GGUF/resolve/main/gemma-3-4b-it-Q5_K_M.gguf?download=true",
+            size = "~2.8 GB"
         )
     )
 
@@ -61,8 +61,6 @@ class ModelDownloadManager(private val context: Context) {
         val filesDir = context.filesDir
         val updated = predefinedModels.map { model ->
             val file = File(filesDir, model.fileName)
-            // Жесткая проверка: GGUF модели весят сотни мегабайт.
-            // Если файл меньше 10 МБ - это ошибка скачивания (HTML-заглушка). Мы его удаляем.
             if (file.exists()) {
                 if (file.length() > 10 * 1024 * 1024) {
                     model.copy(state = DownloadState.DOWNLOADED, downloadProgress = 100)
@@ -86,7 +84,6 @@ class ModelDownloadManager(private val context: Context) {
     }
 
     fun downloadModel(model: AiModel) {
-        // Удаляем "битые" остатки перед новым скачиванием
         File(context.getExternalFilesDir(null), model.fileName).delete()
         File(context.filesDir, model.fileName).delete()
 
@@ -124,7 +121,6 @@ class ModelDownloadManager(private val context: Context) {
                             val externalFile = File(context.getExternalFilesDir(null), fileName)
                             val internalFile = File(context.filesDir, fileName)
 
-                            // Проверяем, не скачалась ли пустышка
                             if (externalFile.exists() && externalFile.length() < 10 * 1024 * 1024) {
                                 externalFile.delete()
                                 updateModelState(fileName, DownloadState.NOT_DOWNLOADED, 0)
@@ -170,13 +166,11 @@ class ModelDownloadManager(private val context: Context) {
 
     fun deleteModel(fileName: String) {
         try {
-            // Удаляем файл из внутренней директории
             val internalFile = File(context.filesDir, fileName)
             if (internalFile.exists()) {
                 internalFile.delete()
             }
 
-            // На всякий случай подчищаем и во внешней (если вдруг зависло скачивание)
             val externalFile = File(context.getExternalFilesDir(null), fileName)
             if (externalFile.exists()) {
                 externalFile.delete()
@@ -184,7 +178,6 @@ class ModelDownloadManager(private val context: Context) {
 
             Log.d("DownloadManager", "Модель $fileName успешно удалена")
 
-            // Обновляем UI-состояние
             updateModelState(fileName, DownloadState.NOT_DOWNLOADED, 0)
         } catch (e: Exception) {
             Log.e("DownloadManager", "Ошибка при удалении модели", e)

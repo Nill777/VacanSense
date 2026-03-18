@@ -54,7 +54,7 @@ class SettingsRepository(private val context: Context) : ISettingsRepository {
             employment = prefs[Keys.EMPLOYMENT] ?: "",
             schedule = prefs[Keys.SCHEDULE] ?: "",
             salary = prefs[Keys.SALARY] ?: 0,
-            area = prefs[Keys.AREA] ?: "1"
+            area = prefs[Keys.AREA] ?: "113"
         )
     }
 

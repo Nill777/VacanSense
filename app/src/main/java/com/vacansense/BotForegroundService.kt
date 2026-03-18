@@ -59,11 +59,11 @@ class BotForegroundService : Service() {
                     if (selectedFile.isNotBlank()) {
                         val absPath = downloadManager.getAbsolutePath(selectedFile)
 
-                        // 1. Сначала ищем новые вакансии и сохраняем их в базу
-                        Log.i("BotService", "=== Начало цикла: Поиск новых вакансий ===")
+                        // ищем новые вакансии и сохраняем их в базу
+                        Log.i("BotService", "Начало цикла: Поиск новых вакансий")
                         processUseCase.fetchAndSave()
 
-                        // 2. Теперь обрабатываем очередь, пока она не опустеет
+                        // обрабатываем очередь, пока она не опустеет
                         var hasMoreWork = true
                         while (isActive && hasMoreWork) {
                             Log.i("BotService", "Запуск обработки одной вакансии...")
@@ -86,8 +86,8 @@ class BotForegroundService : Service() {
                     Log.e("BotService", "Критическая ошибка в цикле сервиса", e)
                 }
 
-                // 3. Когда все вакансии обработаны, засыпаем надолго (например, 5 минут)
-                Log.i("BotService", "=== Цикл завершен. Сон 5 минут ===")
+                // когда все вакансии обработаны, засыпаем надолго
+                Log.i("BotService", "Цикл завершен. Сон 5 минут")
                 withTimeoutOrNull(5 * 60 * 1000L) {
                     signalManager.wakeUpSignal.first()
                 }

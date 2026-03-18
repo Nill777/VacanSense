@@ -36,8 +36,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Мы больше не запрашиваем файловые хранилища!
-        // Разрешение POST_NOTIFICATIONS для ForegroundService:
+        // Разрешение POST_NOTIFICATIONS для ForegroundService
         val launcher =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {}
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

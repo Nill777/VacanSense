@@ -99,7 +99,7 @@ fun FiltersScreen(viewModel: MainViewModel, navController: NavController) {
         "112" to "Ярославль"
     ).toList().sortedBy { it.second }.toMap()
 
-    val regionOptions = mapOf("" to "Вся Россия") + cityMap
+    val regionOptions = mapOf("113" to "Вся Россия") + cityMap
 
     val expOptions = mapOf(
         "" to "Не важно",
@@ -124,6 +124,8 @@ fun FiltersScreen(viewModel: MainViewModel, navController: NavController) {
         "remote" to "Удаленная работа",
         "flyInFlyOut" to "Вахтовый метод"
     )
+    var localSalary by remember { mutableStateOf<String?>(null) }
+    var localPeriod by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
         topBar = {
@@ -172,8 +174,9 @@ fun FiltersScreen(viewModel: MainViewModel, navController: NavController) {
             ) { s -> viewModel.updateFilters { it.copy(schedule = s) } }
 
             OutlinedTextField(
-                value = if (filters.salary == 0) "" else filters.salary.toString(),
+                value = localSalary ?: if (filters.salary == 0) "" else filters.salary.toString(),
                 onValueChange = { s ->
+                    localSalary = s
                     viewModel.updateFilters {
                         it.copy(
                             salary = s.toIntOrNull() ?: 0
@@ -190,8 +193,9 @@ fun FiltersScreen(viewModel: MainViewModel, navController: NavController) {
                 )
             )
             OutlinedTextField(
-                value = filters.period.toString(),
+                value = localPeriod ?: filters.period.toString(),
                 onValueChange = { s ->
+                    localPeriod = s
                     viewModel.updateFilters {
                         it.copy(
                             period = s.toIntOrNull() ?: 30

@@ -19,7 +19,6 @@ class LlamaCppEngine(private val context: Context) : ILlmRepository {
 
             var engine: InferenceEngine? = null
             try {
-                // КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ ДЛЯ ANR:
                 // Понижаем приоритет текущего потока до фонового уровня.
                 // С++ потоки нейросети унаследуют этот низкий приоритет и не будут
                 // отбирать ресурсы у интерфейса приложения.
@@ -82,7 +81,6 @@ class LlamaCppEngine(private val context: Context) : ILlmRepository {
                     "Текст вакансии: ${text.take(1500)}"
 
         val result = runInference(prompt, systemPrompt, modelPath)
-        // Ищем первое вхождение чисел
         val regex = Regex("\\d+")
         val match = regex.find(result)
         return match?.value?.toIntOrNull()?.coerceIn(0, 100) ?: 0

@@ -35,7 +35,6 @@ class MainViewModel(
 
     val modelsState: StateFlow<List<AiModel>> = downloadManager.modelsState
 
-    // Флоу с вакансиями пересобирается на основе текущего `query` в настройках
     val currentVacancies: StateFlow<List<Vacancy>> = appSettings
         .map { it.query }
         .distinctUntilChanged()

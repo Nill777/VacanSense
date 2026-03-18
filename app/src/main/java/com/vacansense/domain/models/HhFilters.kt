@@ -6,5 +6,5 @@ data class HhFilters(
     val employment: String = "", // full, part, project, volunteer, probation
     val schedule: String = "", // fullDay, shift, flexible, remote, flyInFlyOut
     val salary: Int = 0,
-    val area: String = "113" // Москва по умолчанию
+    val area: String = "113" // Россия по умолчанию
 )
